@@ -1,0 +1,15 @@
+db:
+  host: "172.17.0.1"  
+  port: 15432
+  dbname: house
+  password: root
+
+redis:
+  addr: "172.17.0.1"
+  password: ''
+  db: 0
+
+log:
+  path: "./logs/data.log"
+  env: ""
+  level: 0

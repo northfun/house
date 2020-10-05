@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package pb;
+
+ option go_package = "common/typedef/pb";
+
+// import "google/protobuf/timestamp.proto";
+
+message TableDealHouseInfo {
+	// @inject_tag: `xorm:"autoincr"`
+	uint32 id = 1;
+	// @inject_tag: `xorm:"varchar(64)"`
+	string room_type = 2;
+	string floor = 2;
+	string area = 2;
+	string house_structure= 2;
+	string house_type = 2;
+	string building_type = 2;
+	string room_forward = 2;
+	string build_year = 2;
+	string house_type = 2;
+	string decoration_type = 2;
+	string lianjian_id = 2;
+	string lianjian_id = 2;
+	string lianjian_id = 2;
+	string lianjian_id = 2;
+	uint32 lianjian_id = 2;
+}
+
