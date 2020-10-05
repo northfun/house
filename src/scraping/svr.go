@@ -5,10 +5,12 @@ import (
 
 	"github.com/gocolly/colly"
 	"github.com/gocolly/colly/queue"
+	"github.com/northfun/house/common/utils/icolly"
 	"github.com/northfun/house/common/utils/logger"
 	"github.com/northfun/house/common/utils/redis"
 	"github.com/northfun/house/src/conf"
 	"github.com/northfun/house/src/sink"
+	"go.uber.org/zap"
 
 	oredis "github.com/go-redis/redis"
 	"github.com/gocolly/redisstorage"
@@ -19,8 +21,9 @@ const (
 )
 
 var (
-	PAGES     = []string{ChengjiaoPage}
-	UserAgent = []string{"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36"}
+	DOMAIN_NAME = "https://zz.lianjia.com"
+	PAGES       = []string{ChengjiaoPage}
+	UserAgent   = []string{"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36"}
 )
 
 type AppItfc interface{}
@@ -31,8 +34,9 @@ type Manager struct {
 	sp *sink.SinkPool
 
 	mainC   *colly.Collector
+	innerC  *colly.Collector
+	moreC   *colly.Collector
 	detailC *colly.Collector
-	sameC   *colly.Collector
 
 	storage *redisstorage.Storage
 }
@@ -80,57 +84,59 @@ func (m *Manager) ScrapingHouse(storage *redisstorage.Storage) error {
 		&queue.InMemoryQueueStorage{MaxSize: 10000},
 	)
 
+	innerQ, _ := queue.New(
+		2, // Number of consumer threads
+		&queue.InMemoryQueueStorage{MaxSize: 10000},
+	)
+
+	moreQ, _ := queue.New(
+		2, // Number of consumer threads
+		&queue.InMemoryQueueStorage{MaxSize: 10000},
+	)
+
 	detailQ, _ := queue.New(
 		2,
 		&queue.InMemoryQueueStorage{MaxSize: 10000},
 	)
 
-	sameQ, _ := queue.New(
-		2,
-		&queue.InMemoryQueueStorage{MaxSize: 10000},
-	)
-
-	m.mainC = colly.NewCollector(
-		colly.UserAgent(UserAgent[0]),
-	)
-	m.detailC = colly.NewCollector(
-		colly.UserAgent(UserAgent[0]),
-	)
-	m.sameC = colly.NewCollector(
-		colly.UserAgent(UserAgent[0]),
-	)
-
-	// add storage to the collector
-	if conf.C().Store {
-
-		var err error
-		err = m.mainC.SetStorage(storage)
-		if err != nil {
-			return err
-		}
-		err = m.detailC.SetStorage(storage)
-		if err != nil {
-			return err
-		}
-		err = m.sameC.SetStorage(storage)
-		if err != nil {
-			return err
-		}
-
-		limit := &colly.LimitRule{
-			DomainGlob:  "*",
-			Parallelism: 2,
-			RandomDelay: 10 * time.Second,
-		}
-		m.mainC.Limit(limit)
-		m.detailC.Limit(limit)
-		m.sameC.Limit(limit)
+	limit := &colly.LimitRule{
+		DomainGlob:  "*",
+		Parallelism: 2,
+		RandomDelay: 10 * time.Second,
 	}
 
-	m.MainPage(PAGES, mainQ, detailQ)
-	mainQ.Run(m.mainC)
-	detailQ.Run(m.detailC)
-	sameQ.Run(m.sameC)
+	// add storage to the collector
+	if err := icolly.BatchInitCollector(storage,
+		UserAgent[0], limit,
+		&m.mainC, &m.innerC, &m.moreC, &m.detailC); err != nil {
+		return err
+	}
+
+	m.MainPage(mainQ, innerQ)
+	m.InnerPage(moreQ)
+	m.MorePage(moreQ, detailQ)
+	m.DetailPage()
+
+	for i := range PAGES {
+		mainQ.AddURL(PAGES[i])
+	}
+
+	if err := mainQ.Run(m.mainC); err != nil {
+		logger.Error("[scraping],run main", zap.Error(err))
+		return err
+	}
+	if err := innerQ.Run(m.innerC); err != nil {
+		logger.Error("[scraping],run inner", zap.Error(err))
+		return err
+	}
+	if err := moreQ.Run(m.moreC); err != nil {
+		logger.Error("[scraping],run more", zap.Error(err))
+		return err
+	}
+	if err := detailQ.Run(m.detailC); err != nil {
+		logger.Error("[scraping],run detail", zap.Error(err))
+		return err
+	}
 
 	logger.Info("[scraping],start,goods")
 	return nil

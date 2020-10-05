@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"github.com/northfun/house/common/dao/idb"
 	"github.com/northfun/house/common/typedef/tbtype"
 	"github.com/northfun/house/common/utils/db"
 	"github.com/northfun/house/common/utils/logger"
@@ -15,26 +16,15 @@ func SaveHouses(tc []*tbtype.TableHouseDealInfo) (err error) {
 
 	// 	_, err = db.DB().Table(idb.TableNameCosmetcs).
 	// 		Insert(tc)
+	var insertNum int64
 
-	err = db.DoSession(db.DB(), func(ss *xorm.Session) (ierr error) {
-		for i := range tc {
-			_, ierr = ss.Exec("insert into table_cosmetics(brand,name,e_name,volume,price,type,grassed,purchased,like_rate,effect,goods_id,ingredient_ids) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)",
-				tc[i].Brand,
-				tc[i].Name,
-				tc[i].EName, tc[i].Volume,
-				tc[i].Price, tc[i].Type,
-				tc[i].Grassed, tc[i].Purchased,
-				tc[i].LikeRate, tc[i].Effect,
-				tc[i].GoodsId, tc[i].IngredientIds)
-			if ierr != nil {
-				return
-			}
-
-		}
+	if err = db.DoSession(db.DB(), func(ss *xorm.Session) (ierr error) {
+		insertNum, ierr = ss.Table(idb.TableNameHouseDealInfo).Insert(tc)
 		return
-	})
-	if err != nil {
+	}); err != nil {
 		logger.Warn("[dao],insert cosmetics", zap.Error(err), zap.Reflect("data", tc))
 	}
+
+	logger.Debug("[dao],insert house", zap.Int("slc", len(tc)), zap.Int64("islc", insertNum))
 	return
 }

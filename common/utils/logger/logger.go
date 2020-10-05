@@ -27,7 +27,9 @@ func Init(conf *Config) error {
 		zConf = zap.NewDevelopmentConfig()
 	}
 
-	zConf.OutputPaths = []string{conf.Path}
+	if len(conf.Path) > 0 {
+		zConf.OutputPaths = []string{conf.Path}
+	}
 
 	var err error
 	l, err = zConf.Build()

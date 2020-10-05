@@ -1,15 +1,22 @@
 db:
-  host: "172.17.0.1"  
+  host: "127.0.0.1"  
   port: 15432
   dbname: house
   password: root
+  user: postgres
 
 redis:
-  addr: "172.17.0.1"
+  addr: "127.0.0.1:16379"
   password: ''
   db: 0
 
+start_module:
+  house: true
+
+store: true
+
 log:
   path: "./logs/data.log"
+  # path: ""
   env: ""
   level: 0

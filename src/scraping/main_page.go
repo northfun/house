@@ -2,7 +2,6 @@ package scraping
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/gocolly/colly"
@@ -11,10 +10,16 @@ import (
 	"go.uber.org/zap"
 )
 
-func (m *Manager) MainPage(iurl []string, mainQ, detailQ *queue.Queue) {
+func (m *Manager) MainPage(mainQ, innerQ *queue.Queue) {
+	m.mainC.OnError(func(resp *colly.Response, err error) {
+		logger.Error("[scraping],main,on err",
+			zap.String("url", resp.Request.ProxyURL), zap.Error(err))
+	})
 
-	m.mainC.OnHTML("ul.listContent", func(e *colly.HTMLElement) {
-		e.DOM.Find("a.img").Each(
+	m.mainC.OnHTML("body", func(e *colly.HTMLElement) {
+		// fmt.Println("======url", string(e.Response.Body))
+
+		e.DOM.Find("ul.listContent a.img").Each(
 			func(_ int, s *goquery.Selection) {
 				detailUrl := s.AttrOr("href", "")
 				fmt.Println("d==", detailUrl)
@@ -22,30 +27,95 @@ func (m *Manager) MainPage(iurl []string, mainQ, detailQ *queue.Queue) {
 				if len(detailUrl) == 0 {
 					return
 				}
-				detailQ.AddURL(detailUrl)
+				err := innerQ.AddURL(detailUrl)
 
-				logger.Info("[scrapping],detailUrl", zap.String("url", detailUrl))
+				logger.Info("[scrapping],detailUrl", zap.String("url", detailUrl), zap.Error(err))
 			})
+
+		pageBox := e.DOM.Find("div.page-box.house-lst-page-box")
+		nextUrl := GenPageUrl(
+			DOMAIN_NAME,
+			pageBox.AttrOr("page-url", ""),
+			pageBox.AttrOr("page-data", ""))
+
+		fmt.Println("m==", nextUrl)
+
+		if len(nextUrl) == 0 {
+			return
+		}
+
+		err := mainQ.AddURL(nextUrl)
+
+		logger.Info("[scrapping],nextMainUrl", zap.String("url", nextUrl), zap.Error(err))
+	})
+}
+
+func (m *Manager) InnerPage(moreQ *queue.Queue) {
+	m.innerC.OnError(func(resp *colly.Response, err error) {
+		logger.Error("[scraping],inner,on err",
+			zap.String("url", resp.Request.ProxyURL), zap.Error(err))
 	})
 
-	m.mainC.OnHTML("div.page-box.fr div.page-box.house-lst-page-box",
-		func(e *colly.HTMLElement) {
-			e.DOM.Find("a").Each(
-				func(_ int, s *goquery.Selection) {
-					if !strings.Contains(
-						s.Text(), "下一页") {
-						return
-					}
-					nextMainUri := s.AttrOr("href", "")
-					fmt.Println("m==", nextMainUri)
-					if len(nextMainUri) == 0 {
-						return
-					}
+	m.innerC.OnHTML("body", func(e *colly.HTMLElement) {
+		// fmt.Println("======url", string(e.Response.Body))
 
-					nextMainUrl := ChengjiaoPage + nextMainUri
-					mainQ.AddURL(nextMainUrl)
-					logger.Info("[scrapping],nextMainUrl", zap.String("url", nextMainUrl))
+		// moreUri := e.DOM.Find("a.getMoreHouse").
+		// 	AttrOr("href", "")
 
-				})
-		})
+		communityID := e.DOM.Find("div.house-title.LOGVIEWDATA.LOGVIEW").AttrOr("data-lj_action_housedel_id", "")
+		// fmt.Println("=com=========", communityID)
+		if len(communityID) == 0 {
+			return
+		}
+
+		moreUri := "/chengjiao/c" + communityID
+		nextUrl := DOMAIN_NAME + moreUri
+		if len(nextUrl) == 0 {
+			return
+		}
+
+		err := moreQ.AddURL(nextUrl)
+
+		logger.Info("[scrapping],nextMoreUrl", zap.String("url", nextUrl), zap.Error(err))
+	})
+}
+
+func (m *Manager) MorePage(moreQ, detailQ *queue.Queue) {
+	m.moreC.OnError(func(resp *colly.Response, err error) {
+		logger.Error("[scraping],main,on err",
+			zap.String("url", resp.Request.ProxyURL), zap.Error(err))
+	})
+
+	m.moreC.OnHTML("body", func(e *colly.HTMLElement) {
+		// fmt.Println("======url", string(e.Response.Body))
+
+		e.DOM.Find("ul.listContent a.img").Each(
+			func(_ int, s *goquery.Selection) {
+				detailUrl := s.AttrOr("href", "")
+				fmt.Println("d==", detailUrl)
+
+				if len(detailUrl) == 0 {
+					return
+				}
+				err := detailQ.AddURL(detailUrl)
+
+				logger.Info("[scrapping],detailUrl", zap.String("url", detailUrl), zap.Error(err))
+			})
+
+		pageBox := e.DOM.Find("div.page-box.house-lst-page-box")
+		nextUrl := GenPageUrl(
+			DOMAIN_NAME,
+			pageBox.AttrOr("page-url", ""),
+			pageBox.AttrOr("page-data", ""))
+
+		fmt.Println("mo==", nextUrl)
+
+		if len(nextUrl) == 0 {
+			return
+		}
+
+		err := moreQ.AddURL(nextUrl)
+
+		logger.Info("[scrapping],nextMoreUrl", zap.String("url", nextUrl), zap.Error(err))
+	})
 }
