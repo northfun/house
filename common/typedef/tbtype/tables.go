@@ -6,7 +6,7 @@ type TableHouseDealInfo struct {
 	Price              string  `xorm:"varchar(32)"`
 	ListedPrice        string  `xorm:"varchar(32) comment('挂牌价格')"`
 	AdjustPriceTimes   uint16  `xorm:"smallint"`
-	VisitTimes         uint16  `xorm:"smallint`
+	VisitTimes         uint16  `xorm:"smallint"`
 	RoomType           string  `xorm:"varchar(32) comment('房屋户型')"`
 	Floor              string  `xorm:"varchar(32) comment('所在楼层')"`
 	Area               string  `xorm:"varchar(32) comment('建筑面积')"`
@@ -28,10 +28,15 @@ type TableHouseDealInfo struct {
 	HouseBelong        string  `xorm:"varchar(32) comment('房权所属')"`
 	HouseUsingN        string  `xorm:"varchar(32) comment('房屋用途')"`
 	LianjianId         string  `xorm:"varchar(16) comment('链家编号')"`
-	Pic                []uint8 `xorm:"blob comment('')""`
-	PicUrl             string  `xorm:"varchar(256) comment('')""`
-	Extra              string  `xorm:"varchar(256) comment('')""`
-	Saler              string  `xorm:"varchar(32) comment('交易员')""`
-	SalerPhone         string  `xorm:"varchar(64) comment('交易员电话')""`
-	Sold               string  `xorm:"varchar(16) comment('')""`
+	Pic                []uint8 `xorm:"blob comment('')"`
+	PicUrl             string  `xorm:"varchar(256) comment('')"`
+	Extra              string  `xorm:"varchar(256) comment('')"`
+	Saler              string  `xorm:"varchar(32) comment('交易员')"`
+	SalerPhone         string  `xorm:"varchar(64) comment('交易员电话')"`
+	Sold               string  `xorm:"varchar(16) comment('')"`
+}
+
+type TableBuidingLoc struct {
+	Id   uint32 `xorm:"autoincr"`
+	Name string `xorm:"varchar(128)"`
 }
