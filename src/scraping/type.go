@@ -25,6 +25,9 @@ func GenStPage(str string) (sp StPage) {
 }
 
 func GenPageUrl(dName, pageUrl, pageData string) (url string) {
+	if len(pageUrl) == 0 || len(pageData) == 0 {
+		return
+	}
 	// <div class="page-box house-lst-page-box" comp-module='page' page-url="/chengjiao/pg{page}"page-data='{"totalPage":100,"curPage":1}'></div>
 	sp := GenStPage(pageData)
 	if sp.TotalPage == 0 {

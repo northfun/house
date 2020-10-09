@@ -89,17 +89,18 @@ func (m *Manager) MorePage(moreQ, detailQ *queue.Queue) {
 	m.moreC.OnHTML("body", func(e *colly.HTMLElement) {
 		// fmt.Println("======url", string(e.Response.Body))
 
-		e.DOM.Find("ul.listContent a.img").Each(
+		e.DOM.Find("ul.listContent li").Each(
 			func(_ int, s *goquery.Selection) {
-				detailUrl := s.AttrOr("href", "")
-				fmt.Println("d==", detailUrl)
+
+				detailUrl := s.Find("a.img").AttrOr("href", "")
 
 				if len(detailUrl) == 0 {
 					return
 				}
 				err := detailQ.AddURL(detailUrl)
 
-				logger.Info("[scrapping],detailUrl", zap.String("url", detailUrl), zap.Error(err))
+				logger.Info("[scrapping],detailUrl", zap.String("url", detailUrl),
+					zap.String("from", e.Request.URL.String()), zap.Error(err))
 			})
 
 		pageBox := e.DOM.Find("div.page-box.house-lst-page-box")
@@ -107,8 +108,6 @@ func (m *Manager) MorePage(moreQ, detailQ *queue.Queue) {
 			DOMAIN_NAME,
 			pageBox.AttrOr("page-url", ""),
 			pageBox.AttrOr("page-data", ""))
-
-		fmt.Println("mo==", nextUrl)
 
 		if len(nextUrl) == 0 {
 			return

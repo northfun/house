@@ -3,6 +3,7 @@ package tbtype
 type TableHouseDealInfo struct {
 	Id                 uint32  `xorm:"autoincr"`
 	CommunityName      string  `xorm:"varchar(128)"`
+	CommunityId        string  `xorm:"varchar(24)"`
 	Price              string  `xorm:"varchar(32)"`
 	ListedPrice        string  `xorm:"varchar(32) comment('挂牌价格')"`
 	AdjustPriceTimes   uint16  `xorm:"smallint"`

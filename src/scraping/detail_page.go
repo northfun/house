@@ -102,13 +102,27 @@ func soldInfo(_ int, s *goquery.Selection,
 	}
 }
 
+func getCommunityName(oriStr string) string {
+	trimed := strings.Trim(oriStr, " ")
+
+	if slc := strings.Split(trimed, " "); len(slc) > 1 {
+		return slc[0]
+	}
+	return trimed
+}
+
 func (m *Manager) DetailPage() {
 
 	m.detailC.OnHTML("body", func(e *colly.HTMLElement) {
 		var houseInfo tbtype.TableHouseDealInfo
 
-		houseInfo.CommunityName = strings.Trim(
-			e.DOM.Find("h1.index_h1").Text(), " ")
+		houseInfo.Extra = e.Request.URL.RequestURI()
+
+		houseInfo.CommunityName = getCommunityName(
+			e.DOM.Find("h1.index_h1").Text())
+
+		houseInfo.CommunityId = e.DOM.Find("div.house-title").
+			AttrOr("data-lj_action_housedel_id", "")
 
 		e.DOM.
 			Find("div.introContent div.base div.content ul li").
@@ -146,7 +160,10 @@ func (m *Manager) DetailPage() {
 		houseInfo.SalerPhone = strings.ReplaceAll(
 			e.DOM.Find("div.tel").Text(), " ", "")
 
-		logger.Debug("[scraping],insert house", zap.Reflect("house", houseInfo))
+		logger.Debug("[scraping],insert house",
+			zap.String("url", e.Request.URL.String()),
+			zap.Reflect("house", houseInfo))
+
 		m.sp.InsertHouse(&houseInfo)
 	})
 }

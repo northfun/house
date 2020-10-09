@@ -1,6 +1,8 @@
 package icolly
 
 import (
+	"time"
+
 	"github.com/gocolly/colly"
 	"github.com/gocolly/redisstorage"
 )
@@ -26,6 +28,8 @@ func BatchInitCollector(
 		if limit != nil {
 			(*clts[i]).Limit(limit)
 		}
+
+		(*clts[i]).SetRequestTimeout(time.Second * 30)
 	}
 
 	return
