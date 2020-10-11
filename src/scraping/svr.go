@@ -24,6 +24,12 @@ var (
 	DOMAIN_NAME = "https://zz.lianjia.com"
 	PAGES       = []string{ChengjiaoPage}
 	UserAgent   = []string{"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36"}
+
+	Paipai   = "https://zc-paimai.taobao.com/zc_item_list.htm?spm=a219w.7474998.pagination.6.7a553c54VLyveg&location_code=410105&auction_source=0&front_category=56950002&item_biz_type=6&sorder=2&st_param=-1&auction_start_seg=-1&page=2"
+	Paipai1  = "https://zc-paimai.taobao.com/zc_item_list.htm?spm=a219w.7474998.pagination.2.4f893c54tXtWwp&location_code=410105&auction_source=0&front_category=56950002&item_biz_type=6&sorder=2&st_param=-1&auction_start_seg=-1&page=1"
+	Paipai27 = "ihttps://zc-paimai.taobao.com/list/0_______56950002_6_410103.htm?spm=a219w.7474998.filter.57.4f893c547I3Lft&auction_source=0&sorder=2&st_param=-1&auction_start_seg=-1"
+
+	LOC = "http://api.map.baidu.com/place/v2/search?query=%s&tag=房地产&region=郑州&output=json&ak=%s"
 )
 
 type AppItfc interface{}

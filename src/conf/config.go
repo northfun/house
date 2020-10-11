@@ -18,7 +18,9 @@ type Config struct {
 	Log   logger.Config `yaml:"log" json:"log"`
 	Store bool          `yaml:"store" json:"store"`
 
-	StartModule ModuleSwitch `yaml:"start_module"`
+	Ac string `json:"ac" yaml:"ac"`
+
+	StartModule ModuleSwitch `yaml:"start_module" json:"start_module"`
 }
 
 type ModuleSwitch struct {
