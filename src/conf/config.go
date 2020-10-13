@@ -24,7 +24,8 @@ type Config struct {
 }
 
 type ModuleSwitch struct {
-	House bool `yaml:"house"`
+	House   bool `yaml:"house"`
+	Auction bool `yaml:"auction"`
 }
 
 func Init(addr string) error {

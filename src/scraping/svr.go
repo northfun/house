@@ -45,6 +45,8 @@ type Manager struct {
 	detailC *colly.Collector
 
 	storage *redisstorage.Storage
+
+	auction *AuctionManager
 }
 
 func (m *Manager) Init(_app AppItfc) {
@@ -80,6 +82,13 @@ func (m *Manager) Start() error {
 		}
 	}
 
+	if conf.C().StartModule.Auction {
+		m.auction = NewAuctionManager(
+			m.sp, storage)
+
+		m.auction.Start()
+	}
+
 	logger.Info("[scraping],start")
 	return nil
 }
@@ -113,7 +122,7 @@ func (m *Manager) ScrapingHouse(storage *redisstorage.Storage) error {
 
 	// add storage to the collector
 	if err := icolly.BatchInitCollector(storage,
-		UserAgent[0], limit,
+		UserAgent[0], limit, nil,
 		&m.mainC, &m.innerC, &m.moreC, &m.detailC); err != nil {
 		return err
 	}
