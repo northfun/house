@@ -5,6 +5,7 @@ import (
 	"github.com/northfun/house/common/typedef/tbtype"
 	"github.com/northfun/house/common/utils/db"
 	"github.com/northfun/house/common/utils/logger"
+	"github.com/northfun/house/src/conf"
 	"go.uber.org/zap"
 	"xorm.io/xorm"
 )
@@ -47,7 +48,7 @@ func SaveSubjectMatterInfo(tc []*tbtype.TableSubjectMatterInfo) (err error) {
 
 	if err = db.DoSession(db.DB(), func(ss *xorm.Session) (ierr error) {
 		if insertNum, ierr = ss.Table(
-			idb.TableNameAuctionReview).
+			idb.TableNameSubjectMatterInfo).
 			Insert(tc); ierr != nil {
 			return
 		}
@@ -69,6 +70,9 @@ func SaveSubjectMatterInfo(tc []*tbtype.TableSubjectMatterInfo) (err error) {
 }
 
 func LoadUnflagedAuctionItems() (urls []string, err error) {
+	if len(conf.C().TestUrls) > 0 {
+		return conf.C().TestUrls, nil
+	}
 	err = db.DB().Table(idb.TableNameAuctionReview).
 		Where("flag=0").
 		Cols("item_url").

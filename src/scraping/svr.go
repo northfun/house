@@ -47,6 +47,8 @@ type Manager struct {
 	storage *redisstorage.Storage
 
 	auction *AuctionManager
+
+	lauc *LoadAuctionManager
 }
 
 func (m *Manager) Init(_app AppItfc) {
@@ -91,6 +93,13 @@ func (m *Manager) Start() error {
 			m.sp, storage)
 
 		m.auction.Start()
+	}
+
+	if conf.C().StartModule.SM {
+		m.lauc = NewLoadAuctionManager(
+			m.sp, storage)
+
+		m.lauc.Start()
 	}
 
 	logger.Info("[scraping],start")
@@ -165,5 +174,8 @@ func (m *Manager) Stop() {
 	m.sp.Stop()
 	if m.auction != nil {
 		m.auction.Stop()
+	}
+	if m.lauc != nil {
+		m.lauc.Stop()
 	}
 }

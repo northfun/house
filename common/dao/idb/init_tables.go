@@ -7,14 +7,16 @@ import (
 )
 
 const (
-	TableNameHouseDealInfo = "table_house_deal_info"
-	TableNameAuctionReview = "table_auction_review"
+	TableNameHouseDealInfo     = "table_house_deal_info"
+	TableNameAuctionReview     = "table_auction_review"
+	TableNameSubjectMatterInfo = "table_subject_matter_info"
 )
 
 var (
 	tables = []interface{}{
 		&tbtype.TableHouseDealInfo{},
 		&tbtype.TableAuctionReview{},
+		&tbtype.TableSubjectMatterInfo{},
 		// &rpb.TableSkinType{},
 	}
 

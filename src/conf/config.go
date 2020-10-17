@@ -24,6 +24,8 @@ type Config struct {
 	AuctionUrls []string `yaml:"auction_urls" json:"auction_urls"`
 
 	StartModule ModuleSwitch `yaml:"start_module" json:"start_module"`
+
+	TestUrls []string `yaml:"test_urls" json:"test_urls"`
 }
 
 type ModuleSwitch struct {

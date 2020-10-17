@@ -43,6 +43,7 @@ func NewViewerDetailCollector(
 }
 
 func (vd *ViewerDetailCollector) Start(
+	log string,
 	doViewer func(vQ, dQ *queue.Queue),
 	doDetail func(),
 	initUrls []string) error {
@@ -79,19 +80,23 @@ func (vd *ViewerDetailCollector) Start(
 
 	if doViewer != nil {
 		if err := viewerQ.Run(vd.ViewerC); err != nil {
-			logger.Error("[vd],run viewer", zap.Error(err))
+			logger.Error("[vd],run viewer",
+				zap.String("log", log),
+				zap.Error(err))
 			return err
 		}
 	}
 
 	if doDetail != nil {
 		if err := detailQ.Run(vd.DetailC); err != nil {
-			logger.Error("[vd],run detail", zap.Error(err))
+			logger.Error("[vd],run detail",
+				zap.String("log", log), zap.Error(err))
 			return err
 		}
 	}
 
-	logger.Info("[vd],start")
+	logger.Info("[vd],start",
+		zap.String("log", log))
 	return nil
 }
 
@@ -123,7 +128,7 @@ func NewAuctionManager(
 }
 
 func (am *AuctionManager) Start() error {
-	return am.clc.Start(am.DoViewer,
+	return am.clc.Start("auction", am.DoViewer,
 		am.DoDetail, conf.C().AuctionUrls)
 }
 

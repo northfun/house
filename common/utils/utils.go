@@ -17,6 +17,21 @@ func ParseUint32(str string) (uint32, error) {
 	return uint32(iuint), err
 }
 
+func LastPart2Uint64(url string) uint64 {
+	idx := strings.LastIndex(url, "=")
+	if idx == 0 {
+		return 0
+	}
+
+	ret, err := strconv.Atoi(url[idx+1:])
+	if err != nil {
+		logger.Warn("[utils],last part 2 uint64",
+			zap.String("url", url[idx+1:]), zap.Error(err))
+		return 0
+	}
+	return uint64(ret)
+}
+
 func ParseUrlQuery(q, name string) string {
 	return url.Values{q: {name}}.Encode()
 }
@@ -39,16 +54,24 @@ func Int64Ms2Time(itm int64) (tm time.Time) {
 	return
 }
 
+func TrimForNum(str string) string {
+	str = Trim(str)
+
+	str = strings.ReplaceAll(str, "¥", "")
+	str = strings.ReplaceAll(str, ":", "")
+
+	return str
+}
+
 func Trim(str string) string {
 	str = strings.ReplaceAll(str, " ", "")
 	str = strings.ReplaceAll(str, "\u00a0", "")
 	str = strings.ReplaceAll(str, "\u00A0", "")
 	str = strings.ReplaceAll(str, "\u0020", "")
-	str = strings.ReplaceAll(str, "\u0030", "")
+	// str = strings.ReplaceAll(str, "\u0030", "")
 	str = strings.ReplaceAll(str, "&nbsp;", "")
 	str = strings.ReplaceAll(str, "\n", "")
 
-	// fmt.Printf("====%q====", str)
 	return str
 }
 
@@ -64,6 +87,9 @@ func StructByReflect(data map[string]string, inStructPtr interface{}) {
 
 	for i := 0; i < rType.NumField(); i++ {
 		tagName := rType.Field(i).Tag.Get("cname")
+		if len(tagName) == 0 {
+			continue
+		}
 		f := rVal.Field(i)
 
 		for cName, v := range data {
@@ -79,11 +105,23 @@ func StructByReflect(data map[string]string, inStructPtr interface{}) {
 func CovToPrice(str string) float64 {
 	str = strings.ReplaceAll(str, "\"", "")
 	str = strings.ReplaceAll(str, ",", "")
-	str = Trim(str)
+	str = TrimForNum(str)
 
 	f, err := strconv.ParseFloat(str, 64)
+	if len(str) == 0 {
+		return 0
+	}
 	if err != nil {
 		logger.Warn("[utils],parse float", zap.String("str", str), zap.Error(err))
 	}
 	return f
+}
+
+func ExtraHousePropertyRight(name string) (string, string) {
+	slc := strings.Split(name, "（")
+	if len(slc) < 1 {
+		return name, ""
+	}
+
+	return slc[0], slc[1]
 }
