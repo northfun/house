@@ -46,6 +46,7 @@ type TableAuctionReview struct {
 	SupportLoans      uint32 `xorm:"varchar(128)" json:"supportLoans"`
 	SupportOrgLoan    uint32 `xorm:"varchar(128)" json:"supportOrgLoan"`
 	TrackParams       string `xorm:"varchar(128)" json:"trackParams"`
+	Flag              uint32 `xorm:"smallint" `
 }
 
 type TableSubjectMatterInfo struct {
@@ -56,15 +57,15 @@ type TableSubjectMatterInfo struct {
 	MarketPrice         float64 `xorm:"numeric(19,4)"`
 	PriceRaise          float64 `xorm:"numeric(19,4)"`
 	AlarmTimes          uint32  `xorm:"smallint"`
-	AuctionTimes        string  `cname:"auction_times" xorm:"smallint"`
+	AuctionTimes        uint32  `cname:"auction_times" xorm:"smallint"`
 	GuaranteeDeposit    float64 `xorm:"numeric(19,4)" cname:"deposit" xorm:""`
 	Name                string  `xorm:"varchar(128)" cname:"名称" xorm:""`
 	PubArea             string  `xorm:"varchar(128)" cname:"公摊" xorm:""`
 	PayFirst            string  `xorm:"varchar(128)" cname:"优先购置权" xorm:""`
 	Layer               string  `xorm:"varchar(128)" cname:"楼层" xorm:""`
 	PriceEvaluatCompany string  `xorm:"varchar(128)" cname:"估价方" xorm:""`
-	LandPropertRight    string  `xorm:"varchar(128)" cname:"土地产权证" xorm:""`
-	HousePropertRight   string  `xorm:"varchar(128)" cname:"房屋产权证" xorm:""`
+	LandPropertyRight   string  `xorm:"varchar(128)" cname:"土地产权证" xorm:""`
+	HousePropertyRight  string  `xorm:"varchar(128)" cname:"房屋产权证" xorm:""`
 	RightSource         string  `xorm:"varchar(128)" cname:"权力来源" xorm:""`
 	SealUpBy            string  `xorm:"varchar(128)" cname:"查封单位" xorm:""`
 	Owner               string  `xorm:"varchar(128)" cname:"所有人" xorm:""`
