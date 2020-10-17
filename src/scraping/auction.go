@@ -10,6 +10,7 @@ import (
 	"github.com/northfun/house/common/utils"
 	"github.com/northfun/house/common/utils/icolly"
 	"github.com/northfun/house/common/utils/logger"
+	"github.com/northfun/house/src/conf"
 	"github.com/northfun/house/src/sink"
 	"go.uber.org/zap"
 )
@@ -56,21 +57,38 @@ func (vd *ViewerDetailCollector) Start(
 		&queue.InMemoryQueueStorage{MaxSize: 10000},
 	)
 
-	doViewer(viewerQ, detailQ)
-	doDetail()
+	if doViewer != nil {
+		doViewer(viewerQ, detailQ)
 
-	for i := range initUrls {
-		viewerQ.AddURL(initUrls[i])
-		vd.ViewerC.SetCookies(initUrls[i], vd.Ck)
+		for i := range initUrls {
+			viewerQ.AddURL(initUrls[i])
+			vd.ViewerC.SetCookies(initUrls[i], vd.Ck)
+		}
 	}
 
-	if err := viewerQ.Run(vd.ViewerC); err != nil {
-		logger.Error("[vd],run viewer", zap.Error(err))
-		return err
+	if doDetail != nil {
+		doDetail()
+
+		if doViewer == nil {
+			for i := range initUrls {
+				detailQ.AddURL(initUrls[i])
+				vd.DetailC.SetCookies(initUrls[i], vd.Ck)
+			}
+		}
 	}
-	if err := detailQ.Run(vd.DetailC); err != nil {
-		logger.Error("[vd],run detail", zap.Error(err))
-		return err
+
+	if doViewer != nil {
+		if err := viewerQ.Run(vd.ViewerC); err != nil {
+			logger.Error("[vd],run viewer", zap.Error(err))
+			return err
+		}
+	}
+
+	if doDetail != nil {
+		if err := detailQ.Run(vd.DetailC); err != nil {
+			logger.Error("[vd],run detail", zap.Error(err))
+			return err
+		}
 	}
 
 	logger.Info("[vd],start")
@@ -92,7 +110,7 @@ func NewAuctionManager(
 	sp *sink.SinkPool,
 	storage *redisstorage.Storage) *AuctionManager {
 
-	rawCookies := ""
+	rawCookies := conf.C().Cookie
 
 	return &AuctionManager{
 		domainName: "",
@@ -100,30 +118,13 @@ func NewAuctionManager(
 		clc: NewViewerDetailCollector(
 			storage, rawCookies),
 
-		fromUrls: []string{
-			// zhongyuan
-			"https://zc-paimai.taobao.com/list/0_______56950002_6_410102.htm?spm=a219w.7474998.filter.57.35743c54koWIz8&auction_source=0&sorder=2&st_param=-1&auction_start_seg=-1",
-			// erqi
-			"ihttps://zc-paimai.taobao.com/list/0_______56950002_6_410103.htm?spm=a219w.7474998.filter.58.19c33c546W8Wgk&auction_source=0&sorder=2&st_param=-1&auction_start_seg=-1",
-			// guancheng
-			"https://zc-paimai.taobao.com/list/0_______56950002_6_410104.htm?spm=a219w.7474998.filter.59.3f943c54GxfItm&auction_source=0&sorder=2&st_param=-1&auction_start_seg=-1",
-			// jinshui
-			"https://zc-paimai.taobao.com/list/0_______56950002_6_410105.htm?spm=a219w.7474998.filter.60.4ce13c542FWsY8&auction_source=0&sorder=2&st_param=-1&auction_start_seg=-1",
-			// shangjie
-			"https://zc-paimai.taobao.com/list/0_______56950002_6_410106.htm?spm=a219w.7474998.filter.61.664c3c54mq24MX&auction_source=0&sorder=2&st_param=-1&auction_start_seg=-1",
-			// huiji
-			"https://zc-paimai.taobao.com/list/0_______56950002_6_410108.htm?spm=a219w.7474998.filter.62.2e043c5480GlQi&auction_source=0&sorder=2&st_param=-1&auction_start_seg=-1",
-			// zhengdong
-			"https://zc-paimai.taobao.com/list/0_______56950002_6_410186.htm?spm=a219w.7474998.filter.69.49d33c54SFgdlZ&auction_source=0&sorder=2&st_param=-1&auction_start_seg=-1",
-			// gaoxin
-			"https://zc-paimai.taobao.com/list/0_______56950002_6_410187.htm?spm=a219w.7474998.filter.70.40e73c54O21KvA&auction_source=0&sorder=2&st_param=-1&auction_start_seg=-1",
-		},
+		fromUrls: []string{},
 	}
 }
 
 func (am *AuctionManager) Start() error {
 	return am.clc.Start(am.DoViewer,
-		am.DoDetail, am.fromUrls)
+		am.DoDetail, conf.C().AuctionUrls)
 }
 
 func (am *AuctionManager) Stop() {}

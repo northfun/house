@@ -1,11 +1,25 @@
 package icolly
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/gocolly/colly"
 	"github.com/gocolly/redisstorage"
 )
+
+func Referrer(c *colly.Collector) {
+	c.OnResponse(func(r *colly.Response) {
+		r.Ctx.Put("_referrer", r.Request.URL.String())
+		fmt.Println("put===========", r.Request.URL.String())
+	})
+	c.OnRequest(func(r *colly.Request) {
+		if ref := r.Ctx.Get("_referrer"); len(ref) > 0 {
+			r.Headers.Set("referer", ref)
+			fmt.Println("set===========", ref)
+		}
+	})
+}
 
 func BatchInitCollector(
 	storage *redisstorage.Storage,
@@ -22,8 +36,10 @@ func BatchInitCollector(
 
 		(*clts[i]) = newC
 
-		if err = (*clts[i]).SetStorage(storage); err != nil {
-			return err
+		if storage != nil {
+			if err = (*clts[i]).SetStorage(storage); err != nil {
+				return err
+			}
 		}
 
 		if limit != nil {
@@ -35,6 +51,8 @@ func BatchInitCollector(
 		if onRequest != nil {
 			(*clts[i]).OnRequest(onRequest)
 		}
+
+		Referrer(newC)
 	}
 	return
 }

@@ -2,10 +2,14 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/gocolly/colly"
 	"github.com/gocolly/colly/queue"
+	"github.com/northfun/house/common/typedef/tbtype"
 	"github.com/northfun/house/common/utils"
+
+	"github.com/northfun/house/common/utils/ihttp"
 )
 
 var (
@@ -18,8 +22,11 @@ var (
 
 	urlSlc = []string{
 		// "https://zc-paimai.taobao.com/zc_item_list.htm?spm=a219w.7474998.pagination.2.4f893c54tXtWwp&location_code=410105&auction_source=0&front_category=56950002&item_biz_type=6&sorder=2&st_param=-1&auction_start_seg=-1&page=1",
-		"https://zc-paimai.taobao.com/zc_item_list.htm?spm=a219w.7474998.pagination.2.4f893c54tXtWwp&location_code=410105&auction_source=0&front_cat%20%20egory=56950002&item_biz_type=6&sorder=2&st_param=-1&auction_start_seg=-1&page=1",
+		// "https://zc-paimai.taobao.com/zc_item_list.htm?spm=a219w.7474998.pagination.2.4f893c54tXtWwp&location_code=410105&auction_source=0&front_cat%20%20egory=56950002&item_biz_type=6&sorder=2&st_param=-1&auction_start_seg=-1&page=1",
 		// "https://zc-item.taobao.com/auction/623899018936.htm",
+		// "https://sf-item.taobao.com/sf_item/623899018936.htm?spm=a219w.7474998.paiList.1.17303c54FDNxNQ",
+		// "https://desc.alicdn.com/i7/600/390/602393294291/TB1.O5sfX67gK0jSZPf8quhhFla.desc%7Cvar%5Edesc%3Bsign%5E6308d2e3366668e9e12fb6e59fe019d5%3Blang%5Egbk%3Bt%5E1569291173",
+		"https://desc.alicdn.com/i3/550/540/550547990743/TB14SagRXXXXXXgXFXX8qtpFXlX.desc%7Cvar%5Edesc%3Bsign%5E3cd0a8f57b8cc8265b8f57c6db2f551a%3Blang%5Egbk%3Bt%5E1560250762",
 	}
 )
 
@@ -33,12 +40,28 @@ func main() {
 		colly.UserAgent(userAgent),
 	)
 
-	cc := utils.GenCookies(rawCookies2)
-	fmt.Println("=======cc ", cc)
+	utils.GenCookies(rawCookies2)
 
 	for i := range urlSlc {
-		mainQ.AddURL(urlSlc[i])
-		mainC.SetCookies(urlSlc[i], cc)
+		// mainQ.AddURL(urlSlc[i])
+		// mainC.SetCookies(urlSlc[i], cc)
+
+		data, err := ihttp.Get(urlSlc[i])
+		if err != nil {
+			fmt.Println("=======", err)
+			return
+		}
+
+		retMap, err := ihttp.DealSubjectMatterTable(data)
+		if err != nil {
+			return
+		}
+		fmt.Println(retMap)
+
+		var tb tbtype.TableSubjectMatterInfo
+		utils.StructByReflect(retMap, &tb)
+		fmt.Println(retMap)
+		fmt.Println(tb)
 	}
 
 	mainC.OnRequest(func(r *colly.Request) {
@@ -51,10 +74,13 @@ func main() {
 		r.Headers.Set("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
 	})
 
-	mainC.OnHTML("#sf-item-list-data", func(e *colly.HTMLElement) {
+	// mainC.OnHTML("#J_NoticeDetail", func(e *colly.HTMLElement) {
+	mainC.OnHTML("#J_desc", func(e *colly.HTMLElement) {
 		// mainC.OnHTML("#J_ImgBooth", func(e *colly.HTMLElement) {
-		fmt.Println("======url", e.Request.URL)
-		fmt.Println("======body", e.Text)
+		fmt.Println("======d==url", e.Request.URL)
+		fmt.Println("======d==body",
+			strings.Replace(e.Text,
+				" ", "", -1))
 	})
 
 	// mainC.OnHTML("#pro_details p", func(e *colly.HTMLElement) {

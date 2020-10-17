@@ -8,11 +8,13 @@ import (
 
 const (
 	TableNameHouseDealInfo = "table_house_deal_info"
+	TableNameAuctionReview = "table_auction_review"
 )
 
 var (
 	tables = []interface{}{
 		&tbtype.TableHouseDealInfo{},
+		&tbtype.TableAuctionReview{},
 		// &rpb.TableSkinType{},
 	}
 

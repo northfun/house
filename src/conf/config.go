@@ -13,12 +13,15 @@ import (
 var c Config
 
 type Config struct {
-	DB    db.Config     `yaml:"db" json:"db"`
-	Redis redis.Config  `yaml:"redis" json:"redis"`
-	Log   logger.Config `yaml:"log" json:"log"`
-	Store bool          `yaml:"store" json:"store"`
+	DB       db.Config     `yaml:"db" json:"db"`
+	Redis    redis.Config  `yaml:"redis" json:"redis"`
+	Log      logger.Config `yaml:"log" json:"log"`
+	Store    bool          `yaml:"store" json:"store"`
+	UseCache bool          `yaml:"use_cache" json:"use_cache"`
 
-	Ac string `json:"ac" yaml:"ac"`
+	Ac          string   `json:"ac" yaml:"ac"`
+	Cookie      string   `yaml:"cookie" json:"cookie"`
+	AuctionUrls []string `yaml:"auction_urls" json:"auction_urls"`
 
 	StartModule ModuleSwitch `yaml:"start_module" json:"start_module"`
 }
@@ -26,6 +29,7 @@ type Config struct {
 type ModuleSwitch struct {
 	House   bool `yaml:"house"`
 	Auction bool `yaml:"auction"`
+	SM      bool `yaml:"sm"`
 }
 
 func Init(addr string) error {

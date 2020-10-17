@@ -4,7 +4,8 @@ go 1.14
 
 require (
 	9fans.net/go v0.0.2 // indirect
-	github.com/PuerkitoBio/goquery v1.5.0
+	github.com/PuerkitoBio/goquery v1.6.0
+	github.com/axgle/mahonia v0.0.0-20180208002826-3358181d7394
 	github.com/go-redis/redis v6.15.8+incompatible
 	github.com/go-redis/redis/v8 v8.0.0-beta.3 // indirect
 	github.com/gocolly/colly v1.2.0

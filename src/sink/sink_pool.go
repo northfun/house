@@ -20,6 +20,7 @@ const (
 
 type SinkPool struct {
 	houses chan *tbtype.TableHouseDealInfo
+	sm     chan *tbtype.TableSubjectMatterInfo
 
 	rcli *redis.Client
 
@@ -30,6 +31,7 @@ type SinkPool struct {
 func NewSinkPool(cli *redis.Client) *SinkPool {
 	return &SinkPool{
 		houses: make(chan *tbtype.TableHouseDealInfo, 1),
+		sm:     make(chan *tbtype.TableSubjectMatterInfo, 1),
 
 		rcli: cli,
 
@@ -42,12 +44,20 @@ func (sp *SinkPool) Start() (err error) {
 		sp.StartHouse()
 	}
 
+	if conf.C().StartModule.SM {
+		sp.StartSubjectMatter()
+	}
+
 	logger.Info("[sinkpool],start")
 	return
 }
 
 func (sp *SinkPool) StartHouse() {
 	sp.goHouse()
+}
+
+func (sp *SinkPool) StartSubjectMatter() {
+	sp.goSubjectMatter()
 }
 
 func (sp *SinkPool) Stop() {
@@ -107,6 +117,57 @@ func (sp *SinkPool) goHouse() {
 	}()
 }
 
+func (sp *SinkPool) goSubjectMatter() {
+	go func() {
+		sp.wg.Add(1)
+		defer sp.wg.Done()
+
+		ticker := time.NewTicker(CACHE_SAVE_DUR)
+		cacheNum := CACHE_NUM / 2
+		ingSlc := make([]*tbtype.TableSubjectMatterInfo,
+			cacheNum)
+
+		var i int
+		var nextSave int64
+		for {
+			select {
+			case <-sp.stop:
+				close(sp.sm)
+
+				if i == 0 {
+					return
+				}
+				sp.saveAndResetSmSlc(ingSlc)
+				return
+			case ing := <-sp.sm:
+				ingSlc[i] = ing
+				i++
+
+				if i < cacheNum {
+					continue
+				}
+				nextSave = time.Now().Unix() +
+					CACHE_SAVE_INT
+				sp.saveAndResetSmSlc(ingSlc)
+				i = 0
+			case <-ticker.C:
+				if i == 0 {
+					continue
+				}
+
+				if time.Now().Unix() < nextSave {
+					continue
+				}
+
+				nextSave = time.Now().Unix() +
+					CACHE_SAVE_INT
+				sp.saveAndResetSmSlc(ingSlc[:i])
+				i = 0
+			}
+		}
+	}()
+}
+
 func (sp *SinkPool) saveAndResetHouseSlc(hSlc []*tbtype.TableHouseDealInfo) (err error) {
 	if err = dao.SaveHouses(hSlc); err != nil {
 		logger.Warn("[dao],saveHouses", zap.Error(err))
@@ -119,7 +180,24 @@ func (sp *SinkPool) saveAndResetHouseSlc(hSlc []*tbtype.TableHouseDealInfo) (err
 	return
 }
 
+func (sp *SinkPool) saveAndResetSmSlc(hSlc []*tbtype.TableSubjectMatterInfo) (err error) {
+	if err = dao.SaveSubjectMatterInfo(hSlc); err != nil {
+		logger.Warn("[dao],saveSubjectMatter", zap.Error(err))
+		return
+	}
+
+	for i := range hSlc {
+		hSlc[i] = nil
+	}
+	return
+}
+
 func (sp *SinkPool) InsertHouse(tc *tbtype.TableHouseDealInfo) {
 	sp.houses <- tc
+	return
+}
+
+func (sp *SinkPool) InsertSubjectMatter(tc *tbtype.TableSubjectMatterInfo) {
+	sp.sm <- tc
 	return
 }

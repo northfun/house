@@ -17,7 +17,7 @@ house:
 dirs := $(shell ls ${CUR_PATH}/common/typedef/pb)
 inject:
 	$(foreach N,$(dirs),protoc-go-inject-tag -input=${CUR_PATH}/common/typedef/pb/${N} -XXX_skip=gorm;)
-	@: # protoc-go-inject-tag -input=${CUR_PATH}/common/typedef/pb/*.pb.go -XXX_skip=gorm
+	# protoc-go-inject-tag -input=${CUR_PATH}/common/typedef/pb/*.pb.go -XXX_skip=gorm
 
 test:
 	go test -v ./src/scraping/

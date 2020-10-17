@@ -69,11 +69,15 @@ func (m *Manager) Start() error {
 
 	m.sp.Start()
 	// create the redis storage
-	storage := &redisstorage.Storage{
-		Address:  redisC.Addr,
-		Password: redisC.Password,
-		DB:       redisC.DB,
-		Prefix:   "colley storage",
+	var storage *redisstorage.Storage
+
+	if conf.C().UseCache {
+		storage = &redisstorage.Storage{
+			Address:  redisC.Addr,
+			Password: redisC.Password,
+			DB:       redisC.DB,
+			Prefix:   "colley storage",
+		}
 	}
 
 	if conf.C().StartModule.House {
@@ -159,4 +163,7 @@ func (m *Manager) ScrapingHouse(storage *redisstorage.Storage) error {
 
 func (m *Manager) Stop() {
 	m.sp.Stop()
+	if m.auction != nil {
+		m.auction.Stop()
+	}
 }
