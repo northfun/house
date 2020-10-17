@@ -12,19 +12,20 @@ redis:
 
 start_module:
   house: false 
-  auction: true
+  auction: false 
+  sm: true
 
 store: true
 use_cache: false
 
 log:
-  # path: "./logs/data.log"
-  path: ""
+  path: "./logs/data.log"
+  # path: ""
   env: ""
   level: 0
 
 ac: "oONXZ2EXD43VZe9GEOevgEhXdelLHk2u"
-cookie: "_uab_collina=160280036840665447210801; cna=ZeB2FxVKNTICAXW6B4cFwCok; tracknick=%5Cu534Eshow; thw=hk; miid=933691292144237585; v=0; cookie2=13d3d76f5e89eaece247e0fb1cf1e937; t=ff9f8bdeab0e9e1afa70854b15d6091d; _tb_token_=93b77b4e67ee; _samesite_flag_=true; _m_h5_tk=3f249b5519cc219e3696be04867f36d2_1602521845147; _m_h5_tk_enc=87f843503e435020187460e27843f36b; lgc=%5Cu534Eshow; dnk=%5Cu534Eshow; mt=ci=10_1; xlly_s=1; sgcookie=E1004wdfR53cQAYoQxBM5yC%2Bvb404i0fxyba%2FS7MP2GmWvxzmoiK252xgCONLVmoQeP3G7jmhRufyxq7wWlJOEYBQQ%3D%3D; unb=114463686; uc1=cookie15=Vq8l%2BKCLz3%2F65A%3D%3D&cookie16=VFC%2FuZ9az08KUQ56dCrZDlbNdA%3D%3D&cookie21=WqG3DMC9FxUx&cookie14=Uoe0b012hsnN4g%3D%3D&pas=0&existShop=false; uc3=id2=UoCNemP8iwKs&vt3=F8dCufHFRPuqxZ4ZbII%3D&nk2=2HK3AAcO&lg2=VFC%2FuZ9ayeYq2g%3D%3D; csg=14aebc28; cookie17=UoCNemP8iwKs; skt=0c4d632250fd417c; existShop=MTYwMjg1MDQ3NA%3D%3D; uc4=id4=0%40UOgxLgL0RTf9vKzgc9m9ARaVGIE%3D&nk4=0%402kduifIDCu%2Bvxes%2FLwyMboo%3D; _cc_=V32FPkk%2Fhw%3D%3D; _l_g_=Ug%3D%3D; sg=w67; _nk_=%5Cu534Eshow; cookie1=W51Zt2b2hkBQwBrX0Hhfxr3K9TibKSUpCcVeGiiJkLw%3D; x5sec=7b22676f7661756374696f6e3b32223a223663383233323430393364633331643564343661386537366263396233663734434b756470767746454e43436f36764a6f64435149786f4c4d5445304e44597a4e6a67324f7a453d227d; isg=BA0NWd9LbmW1fss05PIC-l0EHC-H6kG8McwXEU-S3aQWRiz4FzqGjLnXsJKEgll0; l=eBSgoFWqQdO0ufWTBO5Brurza7rFmIRb8oVzaNbMiInca6OF9ChD6NQV1b0BWdtb_tfEcetPZ8O53Rn9JbULSpMDBeYCM0Lf3c99-; tfstk=comABO_e9LBxfW2-LqLlfugn7dJlZ2vYstNFXpMSNmmHURIOi_onvM16lJCY2LC.."
+cookie: "cna=ZeB2FxVKNTICAXW6B4cFwCok; tracknick=%5Cu534Eshow; thw=hk; miid=933691292144237585; v=0; cookie2=13d3d76f5e89eaece247e0fb1cf1e937; t=ff9f8bdeab0e9e1afa70854b15d6091d; _tb_token_=93b77b4e67ee; _samesite_flag_=true; lgc=%5Cu534Eshow; dnk=%5Cu534Eshow; mt=ci=10_1; sgcookie=E1004wdfR53cQAYoQxBM5yC%2Bvb404i0fxyba%2FS7MP2GmWvxzmoiK252xgCONLVmoQeP3G7jmhRufyxq7wWlJOEYBQQ%3D%3D; uc3=id2=UoCNemP8iwKs&vt3=F8dCufHFRPuqxZ4ZbII%3D&nk2=2HK3AAcO&lg2=VFC%2FuZ9ayeYq2g%3D%3D; csg=14aebc28; skt=0c4d632250fd417c; existShop=MTYwMjg1MDQ3NA%3D%3D; uc4=id4=0%40UOgxLgL0RTf9vKzgc9m9ARaVGIE%3D&nk4=0%402kduifIDCu%2Bvxes%2FLwyMboo%3D; _cc_=V32FPkk%2Fhw%3D%3D; xlly_s=1; _m_h5_tk=25d8ca8227284a06563e636ee75b0cb5_1602905122923; _m_h5_tk_enc=5b40ca47bddacc37f8a902fbbfd3ac1f; tfstk=cfycBbfKx4TCiqcuOtMbvD9X84yGZFRqlRyYU8u8Ad58uyePiidyTEiNq4z0BC1..; l=eBSgoFWqQdO0uTvBBOfaPurza7yFSIRYSuPzaNbMiOCP_Y1W5_gfWZ5GpETXC3NNh67pR35uFQ64BeYBc7VonxvOcXY25FMmn; isg=BBgYvztl83CZKd6LWUmvbWgv6UCqAXyLJLfijlIJZNMH7bjX-hFMGy5PJW34eDRj; uc1=cookie16=U%2BGCWk%2F74Mx5tgzv3dWpnhjPaQ%3D%3D&cookie21=UIHiLt3xTIkz&existShop=false&pas=0&cookie14=Uoe0b0w2%2F8AAmA%3D%3D"
 
 auction_urls:
   # zhongyuan
@@ -47,4 +48,4 @@ auction_urls:
     #
 
 test_urls:
-  - "https://sf-item.taobao.com/sf_item/627449329993.htm"
+  # - "https://sf-item.taobao.com/sf_item/627449329993.htm"

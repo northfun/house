@@ -126,9 +126,11 @@ func (la *LoadAuctionManager) LoadDoDetail() {
 
 			if len(tb.HousePropertyRight) == 0 {
 				_, tb.HousePropertyRight = utils.ExtraHousePropertyRight(tb.Name)
+				if strings.Contains(tb.HousePropertyRight, "房产证号") {
+					tb.HousePropertyRight = "有"
+				}
 			}
 
-			fmt.Println(tb)
 			la.sp.InsertSubjectMatter(&tb)
 			logger.Info("[scraping],sm insert", zap.Uint64("id", tb.Id))
 		})

@@ -119,7 +119,7 @@ func CovToPrice(str string) float64 {
 
 func ExtraHousePropertyRight(name string) (string, string) {
 	slc := strings.Split(name, "（")
-	if len(slc) < 1 {
+	if len(slc) <= 1 {
 		return name, ""
 	}
 
