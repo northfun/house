@@ -93,13 +93,23 @@ func StructByReflect(data map[string]string, inStructPtr interface{}) {
 		f := rVal.Field(i)
 
 		for cName, v := range data {
-			if strings.Contains(cName, tagName) {
+			if InStringSlc(cName,
+				strings.Split(tagName, ",")) {
 				// f.Set(reflect.ValueOf(v))
 				f.SetString(v)
 				break
 			}
 		}
 	}
+}
+
+func InStringSlc(str string, slc []string) bool {
+	for i := range slc {
+		if strings.Contains(str, slc[i]) {
+			return true
+		}
+	}
+	return false
 }
 
 func CovToPrice(str string) float64 {
@@ -115,6 +125,24 @@ func CovToPrice(str string) float64 {
 		logger.Warn("[utils],parse float", zap.String("str", str), zap.Error(err))
 	}
 	return f
+}
+
+func CovToTimes(str string) uint32 {
+	if len(str) == 0 {
+		return 0
+	}
+	if strings.Contains(str, "一") {
+		return 1
+	} else if strings.Contains(str, "二") {
+		return 2
+	} else if strings.Contains(str, "三") {
+		return 3
+	} else if strings.Contains(str, "四") {
+		return 4
+	} else if strings.Contains(str, "五") {
+		return 5
+	}
+	return 100
 }
 
 func ExtraHousePropertyRight(name string) (string, string) {

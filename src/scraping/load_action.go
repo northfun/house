@@ -61,6 +61,9 @@ func (la *LoadAuctionManager) LoadDoDetail() {
 
 			tb.Id = utils.LastPart2Uint64(oe.DOM.Find("#stream-url").AttrOr("value", ""))
 
+			tb.CurrentPrice = utils.CovToPrice(oe.DOM.Find("span.pm-current-price em").Text())
+			tb.AuctionTimes = utils.CovToTimes(oe.DOM.Find("span.item-status").Text())
+
 			oe.DOM.Find("#J_HoverShow td").
 				Each(func(_ int, tdE *goquery.Selection) {
 					name := utils.Trim(tdE.Find("span.pay-mark").Text())
@@ -110,8 +113,7 @@ func (la *LoadAuctionManager) LoadDoDetail() {
 			data, err := ihttp.Get(dataFrom)
 			if err != nil {
 				logger.Warn("[scraping],LoadDoDetail",
-					zap.Error(err))
-				return
+					zap.Error(err), zap.String("url", dataFrom))
 			}
 
 			retMap, err := ihttp.DealSubjectMatterTable(data)

@@ -65,7 +65,7 @@ type TableSubjectMatterInfo struct {
 	Layer               string  `xorm:"varchar(128)" cname:"楼层" xorm:""`
 	PriceEvaluatCompany string  `xorm:"varchar(128)" cname:"估价方" xorm:""`
 	LandPropertyRight   string  `xorm:"varchar(128)" cname:"土地产权证" xorm:""`
-	HousePropertyRight  string  `xorm:"varchar(128)" cname:"房屋产权证" xorm:""`
+	HousePropertyRight  string  `xorm:"varchar(128)" cname:"房屋产权证,所有权" xorm:""`
 	RightSource         string  `xorm:"varchar(128)" cname:"权力来源" xorm:""`
 	SealUpBy            string  `xorm:"varchar(128)" cname:"查封单位" xorm:""`
 	Owner               string  `xorm:"varchar(128)" cname:"所有人" xorm:""`

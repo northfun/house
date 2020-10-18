@@ -13,7 +13,7 @@ redis:
 start_module:
   house: false 
   auction: false 
-  sm: true
+  sm: true 
 
 store: true
 use_cache: false
@@ -36,7 +36,7 @@ auction_urls:
     #                         # # guancheng
     # - "https://zc-paimai.taobao.com/list/0_______56950002_6_410104.htm?spm=a219w.7474998.filter.59.3f943c54GxfItm&auction_source=0&sorder=2&st_param=-1&auction_start_seg=-1"
     #                         ## jinshui
-    # - "https://zc-paimai.taobao.com/list/0_______56950002_6_410105.htm?spm=a219w.7474998.filter.60.4ce13c542FWsY8&auction_source=0&sorder=2&st_param=-1&auction_start_seg=-1"
+    - "https://zc-paimai.taobao.com/list/0_______56950002_6_410105.htm?spm=a219w.7474998.filter.60.4ce13c542FWsY8&auction_source=0&sorder=2&st_param=-1&auction_start_seg=-1"
     #                         # # shangjie
     # - "https://zc-paimai.taobao.com/list/0_______56950002_6_410106.htm?spm=a219w.7474998.filter.61.664c3c54mq24MX&auction_source=0&sorder=2&st_param=-1&auction_start_seg=-1"
     #                         # # huiji
@@ -48,4 +48,5 @@ auction_urls:
     #
 
 test_urls:
-  - "https://sf-item.taobao.com/sf_item/627449329993.htm"
+  # - "https://sf-item.taobao.com/sf_item/627449329993.htm"
+  - "https://sf-item.taobao.com/sf_item/627643172563.htm"

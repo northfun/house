@@ -2,6 +2,7 @@ package ihttp
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -9,8 +10,6 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/axgle/mahonia"
 	"github.com/northfun/house/common/utils"
-	"github.com/northfun/house/common/utils/logger"
-	"go.uber.org/zap"
 )
 
 func Get(url string) ([]byte, error) {
@@ -53,8 +52,10 @@ func DealSubjectMatterTable(data []byte) (map[string]string, error) {
 		} else if lenContent == 1 {
 			if strings.Contains(content[0], "介绍") {
 				ret["介绍"] = content[0]
+			} else {
+				ret[fmt.Sprintf("%d", i)] = content[0]
 			}
-			logger.Debug("[subject mater],content", zap.String("raw", content[0]))
+			// logger.Debug("[subject mater],content", zap.String("raw", content[0]))
 		}
 	})
 	return ret, nil
